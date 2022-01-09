@@ -292,19 +292,22 @@ class _AddFoodPageState extends State<AddFoodPage> {
       _foodService
           .addFood(_foodController.text, _foodImage ?? '')
           .then((value) {
+        Navigator.pop(context);
+      }).catchError((error) {
+        _warningToast(DietText.errorText);
+      }).whenComplete(() {
         setState(() {
           _isLoading = false;
         });
-        Navigator.pop(context);
       });
     } else {
-      _emptyMessage();
+      _warningToast(DietText.emptyText);
     }
   }
 
-  Future<bool?> _emptyMessage() {
+  Future<bool?> _warningToast(String text) {
     return Fluttertoast.showToast(
-        msg: DietText.emptyText,
+        msg: text,
         timeInSecForIosWeb: 2,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,

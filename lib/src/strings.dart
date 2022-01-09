@@ -1,6 +1,7 @@
 class DietText {
   //Common
   static String emptyText = "Eksik bilgilerle diyet yapılmaz...";
+  static String errorText = "Beklenmedik bir hata oluştu...";
 
   //Launch
   static String mainText = "Diyet Planım";
@@ -24,6 +25,9 @@ class DietText {
 
   //Login
   static String googleLogin = "Google ile giriş yap";
+  static String loginNoAccountText = "Kullanıcı yok, haydi kayıt olma zamanı!";
+  static String loginWrongPasswordText = "Yanlış parola, bir daha düşün...";
+  static String loginWrongEmailText = "Böyle mail mi olur?";
 
   //Home
   static String homeText = "Anasayfa";

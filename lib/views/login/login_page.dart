@@ -5,6 +5,7 @@ import 'package:firebase_notes/src/colors.dart';
 import 'package:firebase_notes/src/strings.dart';
 import 'package:firebase_notes/views/home/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class LoginPage extends StatefulWidget {
@@ -174,24 +175,51 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _loginWithEmail() {
-    setState(() {
-      _isLoading = true;
-    });
-
-    _authService
-        .signInWithEmail(
-      _emailController.text,
-      _passwordController.text,
-    )
-        .then((value) {
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-          (route) => false);
+    if (_emailController.text.isNotEmpty &&
+        _passwordController.text.isNotEmpty) {
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
-    });
+
+      _authService
+          .signInWithEmail(
+        _emailController.text,
+        _passwordController.text,
+      )
+          .then((value) {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const HomePage()),
+            (route) => false);
+      }).catchError((error) {
+        if (error.toString().contains('invalid-email')) {
+          _warningToast(DietText.loginWrongEmailText);
+        } else if (error.toString().contains('user-not-found')) {
+          _warningToast(DietText.loginNoAccountText);
+        } else if (error.toString().contains('wrong-password')) {
+          _warningToast(DietText.loginWrongPasswordText);
+        } else {
+          _warningToast(DietText.errorText);
+        }
+      }).whenComplete(() {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    } else {
+      _warningToast(DietText.emptyText);
+    }
+  }
+
+  Future<bool?> _warningToast(String text) {
+    return Fluttertoast.showToast(
+        msg: text,
+        timeInSecForIosWeb: 2,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        backgroundColor: DietColors.red,
+        textColor: DietColors.white,
+        fontSize: 14);
   }
 
   InkWell _googleButton() {

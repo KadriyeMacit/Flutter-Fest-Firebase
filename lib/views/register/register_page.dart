@@ -378,22 +378,25 @@ class _RegisterPageState extends State<RegisterPage> {
         _dropdownValue,
       )
           .then((value) {
-        setState(() {
-          _isLoading = true;
-        });
         Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(builder: (context) => const LaunchPage()),
             (route) => false);
+      }).catchError((error) {
+        _warningToast(DietText.errorText);
+      }).whenComplete(() {
+        setState(() {
+          _isLoading = false;
+        });
       });
     } else {
-      _emptyMessage();
+      _warningToast(DietText.emptyText);
     }
   }
 
-  Future<bool?> _emptyMessage() {
+  Future<bool?> _warningToast(String text) {
     return Fluttertoast.showToast(
-        msg: DietText.emptyText,
+        msg: text,
         timeInSecForIosWeb: 2,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
