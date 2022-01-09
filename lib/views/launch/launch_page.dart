@@ -61,8 +61,8 @@ class LaunchPage extends StatelessWidget {
   InkWell _loginButton(BuildContext context) {
     return InkWell(
         onTap: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => LoginPage()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const LoginPage()));
         },
         child: Container(
           decoration: BoxDecoration(

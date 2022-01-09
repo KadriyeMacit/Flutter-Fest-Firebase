@@ -1,9 +1,12 @@
 import 'package:firebase_notes/constants/custom_app_bar.dart';
+import 'package:firebase_notes/constants/custom_loading.dart';
+import 'package:firebase_notes/services/auth_service.dart';
 import 'package:firebase_notes/src/colors.dart';
 import 'package:firebase_notes/src/images.dart';
 import 'package:firebase_notes/src/strings.dart';
 import 'package:firebase_notes/views/launch/launch_page.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -13,20 +16,18 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController passwordControllerAgain = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
-  //göz için
-  bool isVisible = true;
+  bool _isVisible = true;
+  bool _ramenValue = false;
+  bool _pizzaValue = false;
+  String _dropdownValue = DietText.ketchup;
+  dynamic _profileImage = '';
+  bool _isLoading = false;
 
-//cinsiyet için
-  bool woman = false;
-  bool man = false;
-
-  //dropdown için
-  final int _value = 1;
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -37,20 +38,25 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Padding _body(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _bodyContainer(),
-          const SizedBox(
-            height: 55,
+  Stack _body(BuildContext context) {
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 50, 20, 30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _bodyContainer(),
+              const SizedBox(
+                height: 55,
+              ),
+              _registerButton(context),
+            ],
           ),
-          _registerButton(context),
-        ],
-      ),
+        ),
+        if (_isLoading) const CustomLoading(),
+      ],
     );
   }
 
@@ -59,7 +65,9 @@ class _RegisterPageState extends State<RegisterPage> {
       child: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(20)),
+          borderRadius: BorderRadius.all(
+            Radius.circular(20),
+          ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -88,7 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 20,
                 ),
                 Text(
-                  DietText.registerQuestionSos,
+                  DietText.registerQuestionsauce,
                   style: const TextStyle(fontSize: 15),
                 ),
                 const SizedBox(
@@ -105,7 +113,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   TextField _usernameTextField() {
     return TextField(
-      controller: nameController,
+      controller: _usernameController,
       cursorColor: DietColors.black,
       decoration: InputDecoration(
         prefixIcon: Icon(
@@ -127,7 +135,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   TextField _emailTextField() {
     return TextField(
-      controller: emailController,
+      controller: _emailController,
       cursorColor: DietColors.black,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
@@ -150,24 +158,24 @@ class _RegisterPageState extends State<RegisterPage> {
 
   TextField _passwordTextField() {
     return TextField(
-      controller: passwordController,
-      obscureText: isVisible ? true : false,
+      controller: _passwordController,
+      obscureText: _isVisible ? true : false,
       cursorColor: DietColors.black,
       decoration: InputDecoration(
         suffixIcon: InkWell(
           onTap: () {
-            if (isVisible) {
+            if (_isVisible) {
               setState(() {
-                isVisible = false;
+                _isVisible = false;
               });
             } else {
               setState(() {
-                isVisible = false;
+                _isVisible = false;
               });
-              isVisible = true;
+              _isVisible = true;
             }
           },
-          child: isVisible
+          child: _isVisible
               ? Icon(
                   Icons.remove_red_eye,
                   color: DietColors.orange,
@@ -227,12 +235,26 @@ class _RegisterPageState extends State<RegisterPage> {
       scale: 1.3,
       child: Checkbox(
         side: BorderSide(color: DietColors.mainColor),
-        value: woman,
+        value: _ramenValue,
         activeColor: DietColors.orange,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        onChanged: (_) {},
+        onChanged: (_) => _setRamenValue(),
       ),
     );
+  }
+
+  void _setRamenValue() {
+    if (_ramenValue != true) {
+      setState(() {
+        _ramenValue = true;
+        _pizzaValue = false;
+        _profileImage = DietImages.ramen;
+      });
+    } else {
+      setState(() {
+        _ramenValue = false;
+      });
+    }
   }
 
   ClipRRect _foodImage(String image) {
@@ -261,12 +283,26 @@ class _RegisterPageState extends State<RegisterPage> {
       scale: 1.3,
       child: Checkbox(
         side: BorderSide(color: DietColors.mainColor),
-        value: woman,
+        value: _pizzaValue,
         activeColor: DietColors.orange,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-        onChanged: (_) {},
+        onChanged: (_) => _setPizzaValue(),
       ),
     );
+  }
+
+  void _setPizzaValue() {
+    if (_pizzaValue != true) {
+      setState(() {
+        _pizzaValue = true;
+        _ramenValue = false;
+        _profileImage = DietImages.pizza;
+      });
+    } else {
+      setState(() {
+        _pizzaValue = false;
+      });
+    }
   }
 
   DropdownButton _dropdownButton() {
@@ -274,54 +310,95 @@ class _RegisterPageState extends State<RegisterPage> {
         borderRadius: BorderRadius.circular(20),
         isExpanded: true,
         iconEnabledColor: DietColors.orange,
-        value: _value,
-        items: const [
+        value: _dropdownValue,
+        items: [
           DropdownMenuItem(
-            child: Text("Ketçap"),
-            value: 1,
+            child: Text(DietText.ketchup),
+            value: DietText.ketchup,
           ),
           DropdownMenuItem(
-            child: Text("Mayonez"),
-            value: 2,
+            child: Text(DietText.mayonnaise),
+            value: DietText.mayonnaise,
           ),
           DropdownMenuItem(
-            child: Text("Barbekü"),
-            value: 3,
+            child: Text(DietText.barbecue),
+            value: DietText.barbecue,
           ),
           DropdownMenuItem(
-            child: Text("Sarımsaklı Sos"),
-            value: 4,
+            child: Text(DietText.ranch),
+            value: DietText.ranch,
           ),
           DropdownMenuItem(
-            child: Text("Ballı Hardal"),
-            value: 5,
+            child: Text(DietText.honeyMustard),
+            value: DietText.honeyMustard,
           ),
         ],
         onChanged: (value) {
           setState(() {
-            // _value = value;
+            _dropdownValue = value;
           });
         });
   }
 
   InkWell _registerButton(BuildContext context) {
     return InkWell(
-        onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => const LaunchPage()));
-        },
+        onTap: () => _registerOnTap(),
         child: Container(
           decoration: BoxDecoration(
-            color: DietColors.white,
+            color: DietColors.orange,
             borderRadius: BorderRadius.circular(10),
           ),
           height: 40,
           child: Center(
             child: Text(
               DietText.registerText,
-              style: TextStyle(color: DietColors.black),
+              style: TextStyle(
+                color: DietColors.white,
+              ),
             ),
           ),
         ));
+  }
+
+  void _registerOnTap() {
+    if (_usernameController.text.isNotEmpty &&
+        _emailController.text.isNotEmpty &&
+        _passwordController.text.isNotEmpty &&
+        _profileImage.toString().isNotEmpty &&
+        _dropdownValue.isNotEmpty) {
+      setState(() {
+        _isLoading = true;
+      });
+      _authService
+          .createPerson(
+        _usernameController.text,
+        _emailController.text,
+        _passwordController.text,
+        _profileImage ?? '',
+        _dropdownValue,
+      )
+          .then((value) {
+        setState(() {
+          _isLoading = true;
+        });
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LaunchPage()),
+            (route) => false);
+      });
+    } else {
+      _emptyMessage();
+    }
+  }
+
+  Future<bool?> _emptyMessage() {
+    return Fluttertoast.showToast(
+        msg: DietText.emptyText,
+        timeInSecForIosWeb: 2,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        backgroundColor: DietColors.red,
+        textColor: DietColors.white,
+        fontSize: 14);
   }
 }

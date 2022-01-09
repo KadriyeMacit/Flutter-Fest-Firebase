@@ -1,6 +1,9 @@
 import 'package:firebase_notes/constants/custom_app_bar.dart';
+import 'package:firebase_notes/constants/custom_loading.dart';
+import 'package:firebase_notes/services/auth_service.dart';
 import 'package:firebase_notes/src/colors.dart';
 import 'package:firebase_notes/src/strings.dart';
+import 'package:firebase_notes/views/home/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -12,10 +15,13 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
-  bool isVisible = true;
+  bool _isVisible = true;
+  bool _isLoading = false;
+
+  final AuthService _authService = AuthService();
 
   @override
   Widget build(BuildContext context) {
@@ -25,29 +31,31 @@ class _LoginPageState extends State<LoginPage> {
         body: _body(context));
   }
 
-  Padding _body(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _bodyContainer(),
-          const SizedBox(
-            height: 55,
+  Stack _body(BuildContext context) {
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 50, 20, 30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _bodyContainer(),
+              _loginButton(context),
+            ],
           ),
-          _loginButton(context),
-        ],
-      ),
+        ),
+        if (_isLoading) const CustomLoading()
+      ],
     );
   }
 
   Flexible _bodyContainer() {
     return Flexible(
       child: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(20)),
+        decoration: BoxDecoration(
+          color: DietColors.white,
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(20),
@@ -78,7 +86,7 @@ class _LoginPageState extends State<LoginPage> {
 
   TextField _emailTextField() {
     return TextField(
-      controller: emailController,
+      controller: _emailController,
       cursorColor: DietColors.black,
       keyboardType: TextInputType.emailAddress,
       decoration: InputDecoration(
@@ -101,24 +109,24 @@ class _LoginPageState extends State<LoginPage> {
 
   TextField _passwordTextField() {
     return TextField(
-      controller: passwordController,
-      obscureText: isVisible ? true : false,
+      controller: _passwordController,
+      obscureText: _isVisible ? true : false,
       cursorColor: DietColors.black,
       decoration: InputDecoration(
         suffixIcon: InkWell(
           onTap: () {
-            if (isVisible) {
+            if (_isVisible) {
               setState(() {
-                isVisible = false;
+                _isVisible = false;
               });
             } else {
               setState(() {
-                isVisible = false;
+                _isVisible = false;
               });
-              isVisible = true;
+              _isVisible = true;
             }
           },
-          child: isVisible
+          child: _isVisible
               ? Icon(
                   Icons.remove_red_eye,
                   color: DietColors.orange,
@@ -147,33 +155,48 @@ class _LoginPageState extends State<LoginPage> {
 
   InkWell _loginButton(BuildContext context) {
     return InkWell(
-        onTap: () {
-          // Navigator.push(context,
-          //     MaterialPageRoute(builder: (context) => const LaunchPage()));
-        },
+        onTap: () => _loginWithEmail(),
         child: Container(
           decoration: BoxDecoration(
-            color: DietColors.white,
+            color: DietColors.orange,
             borderRadius: BorderRadius.circular(10),
           ),
           height: 40,
           child: Center(
             child: Text(
               DietText.loginText,
-              style: TextStyle(color: DietColors.black),
+              style: TextStyle(
+                color: DietColors.white,
+              ),
             ),
           ),
         ));
   }
 
+  void _loginWithEmail() {
+    setState(() {
+      _isLoading = true;
+    });
+
+    _authService
+        .signInWithEmail(
+      _emailController.text,
+      _passwordController.text,
+    )
+        .then((value) {
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+          (route) => false);
+      setState(() {
+        _isLoading = false;
+      });
+    });
+  }
+
   InkWell _googleButton() {
     return InkWell(
-      onTap: () {
-        // _authService.signInWithGoogle().then((value) {
-        //   return Navigator.push(
-        //       context, MaterialPageRoute(builder: (context) => HomePage()));
-        //  });
-      },
+      onTap: () => _loginWithGoogle(),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 5),
         decoration: BoxDecoration(
@@ -182,25 +205,38 @@ class _LoginPageState extends State<LoginPage> {
             borderRadius: const BorderRadius.all(Radius.circular(10))),
         child: Padding(
           padding: const EdgeInsets.all(5.0),
-          child: Center(
-              child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const FaIcon(
-                FontAwesomeIcons.google,
-                color: Colors.white,
-              ),
-              const SizedBox(
-                width: 10,
-              ),
-              Text(
-                DietText.googleLogin,
-                style: TextStyle(color: DietColors.white),
-              ),
-            ],
-          )),
+          child: _googleButtonBody(),
         ),
       ),
     );
+  }
+
+  Center _googleButtonBody() {
+    return Center(
+        child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        FaIcon(
+          FontAwesomeIcons.google,
+          color: DietColors.white,
+        ),
+        const SizedBox(
+          width: 10,
+        ),
+        Text(
+          DietText.googleLogin,
+          style: TextStyle(color: DietColors.white),
+        ),
+      ],
+    ));
+  }
+
+  void _loginWithGoogle() {
+    _authService.signInWithGoogle().then((value) {
+      return Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+          (route) => false);
+    });
   }
 }
