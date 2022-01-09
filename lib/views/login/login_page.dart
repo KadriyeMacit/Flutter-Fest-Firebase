@@ -2,6 +2,7 @@ import 'package:firebase_notes/constants/custom_app_bar.dart';
 import 'package:firebase_notes/constants/custom_loading.dart';
 import 'package:firebase_notes/services/auth_service.dart';
 import 'package:firebase_notes/src/colors.dart';
+import 'package:firebase_notes/src/images.dart';
 import 'package:firebase_notes/src/strings.dart';
 import 'package:firebase_notes/views/home/home_page.dart';
 import 'package:flutter/material.dart';
@@ -37,14 +38,7 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 50, 20, 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _bodyContainer(),
-              _loginButton(context),
-            ],
-          ),
+          child: _bodyContainer(),
         ),
         if (_isLoading) const CustomLoading()
       ],
@@ -69,6 +63,10 @@ class _LoginPageState extends State<LoginPage> {
                   height: 20,
                 ),
                 _passwordTextField(),
+                const SizedBox(
+                  height: 20,
+                ),
+                _loginButton(context),
                 const SizedBox(
                   height: 20,
                 ),
@@ -216,7 +214,7 @@ class _LoginPageState extends State<LoginPage> {
         msg: text,
         timeInSecForIosWeb: 2,
         toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
+        gravity: ToastGravity.BOTTOM,
         backgroundColor: DietColors.red,
         textColor: DietColors.white,
         fontSize: 14);
