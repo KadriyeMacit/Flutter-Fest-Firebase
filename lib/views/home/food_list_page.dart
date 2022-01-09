@@ -79,6 +79,7 @@ class _FoodListPageState extends State<FoodListPage> {
             DietText.dietList,
             style: const TextStyle(fontSize: 16),
           ),
+          const Divider(),
           const SizedBox(
             height: 10,
           ),
