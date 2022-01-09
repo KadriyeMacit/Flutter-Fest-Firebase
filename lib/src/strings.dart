@@ -28,6 +28,7 @@ class DietText {
   static String loginNoAccountText = "Kullanıcı yok, haydi kayıt olma zamanı!";
   static String loginWrongPasswordText = "Yanlış parola, bir daha düşün...";
   static String loginWrongEmailText = "Böyle mail mi olur?";
+  static String crashlytics = "Firebase Crashlytics";
 
   //Home
   static String homeText = "Anasayfa";

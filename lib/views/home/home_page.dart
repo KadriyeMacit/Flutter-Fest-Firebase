@@ -1,6 +1,5 @@
 import 'package:firebase_notes/constants/custom_app_bar.dart';
 import 'package:firebase_notes/services/auth_service.dart';
-import 'package:firebase_notes/services/food_service.dart';
 import 'package:firebase_notes/src/colors.dart';
 import 'package:firebase_notes/src/images.dart';
 import 'package:firebase_notes/src/strings.dart';
@@ -18,7 +17,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final AuthService _authService = AuthService();
-  final FoodService _foodService = FoodService();
 
   @override
   Widget build(BuildContext context) {

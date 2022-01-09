@@ -1,8 +1,8 @@
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:firebase_notes/constants/custom_app_bar.dart';
 import 'package:firebase_notes/constants/custom_loading.dart';
 import 'package:firebase_notes/services/auth_service.dart';
 import 'package:firebase_notes/src/colors.dart';
-import 'package:firebase_notes/src/images.dart';
 import 'package:firebase_notes/src/strings.dart';
 import 'package:firebase_notes/views/home/home_page.dart';
 import 'package:flutter/material.dart';
@@ -38,7 +38,14 @@ class _LoginPageState extends State<LoginPage> {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 50, 20, 30),
-          child: _bodyContainer(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _bodyContainer(),
+              _errorButton(),
+            ],
+          ),
         ),
         if (_isLoading) const CustomLoading()
       ],
@@ -66,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(
                   height: 20,
                 ),
-                _loginButton(context),
+                _loginButton(),
                 const SizedBox(
                   height: 20,
                 ),
@@ -152,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  InkWell _loginButton(BuildContext context) {
+  InkWell _loginButton() {
     return InkWell(
         onTap: () => _loginWithEmail(),
         child: Container(
@@ -264,5 +271,31 @@ class _LoginPageState extends State<LoginPage> {
           MaterialPageRoute(builder: (context) => const HomePage()),
           (route) => false);
     });
+  }
+
+  InkWell _errorButton() {
+    return InkWell(
+        onTap: () => _errorButtonOnTap(),
+        child: Container(
+          decoration: BoxDecoration(
+            color: DietColors.white,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          height: 40,
+          child: Center(
+            child: Text(
+              DietText.crashlytics,
+              style: TextStyle(
+                color: DietColors.black,
+              ),
+            ),
+          ),
+        ));
+  }
+
+  void _errorButtonOnTap() {
+    FirebaseCrashlytics.instance.crash();
+    FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+    FirebaseCrashlytics.instance.setCustomKey('str_key', 'hello');
   }
 }
