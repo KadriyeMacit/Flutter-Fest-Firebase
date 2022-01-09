@@ -322,9 +322,9 @@ class _AddFoodPageState extends State<AddFoodPage> {
       setState(() {
         _foodImage = pickedFile!;
       });
-    } catch (e) {
+    } catch (error) {
       setState(() {
-        _pickImage = e;
+        _pickImage = error;
       });
     }
   }

@@ -1,4 +1,3 @@
-//import 'package:firebase_ornek/service/status_service.dart';
 import 'package:firebase_notes/constants/custom_loading.dart';
 import 'package:firebase_notes/services/food_service.dart';
 import 'package:firebase_notes/src/colors.dart';

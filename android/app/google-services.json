@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "970457623410",
+    "project_id": "flutter-fest-e4cdc",
+    "storage_bucket": "flutter-fest-e4cdc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:970457623410:android:6c49379fc001a6c48f4beb",
+        "android_client_info": {
+          "package_name": "com.example.firebase_notes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "970457623410-kss133i0ra3q89sfkkpeseh8omvhr8qd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOG_67wYVZLi_oiIff254qXGWUZ6ylchE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "970457623410-kss133i0ra3q89sfkkpeseh8omvhr8qd.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "970457623410-tiduhgvsuj52svr4j4sbhdadsra2fuo5.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.firebaseNotes"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
